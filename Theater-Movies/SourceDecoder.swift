@@ -8,6 +8,10 @@
 
 import Foundation
 
+let OriginalSourceURL = "http://www.fandango.com/amclajolla12_aabam/theaterpage?date="
+let RequiredString = "itemscope itemtype=\"http://schema.org/Movie"
+let PartialData = "<span itemscope itemtype=\"http://schema.org/Movie\">"
+
 func retrieveImageURL (strings: [String]) -> [String]{
     
     var result = [String]()

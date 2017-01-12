@@ -28,12 +28,12 @@ class MovieTableViewController: UITableViewController, UISearchBarDelegate{
     
     @IBOutlet weak var SearchBar: UISearchBar!
     
+ 
     @IBAction func Pressed(_ sender: Any) {
         print("filter image size: ", filteredData.images.count)
         print("filtered description size: ", filteredData.summaries.count)
-        
     }
-    
+
     
     override func viewDidLoad() {
         
@@ -43,50 +43,72 @@ class MovieTableViewController: UITableViewController, UISearchBarDelegate{
         session = URLSession.shared
         
         
-      //  refresh_control = UIRefreshControl()
-       // refresh_control.addTarget(self, action: #selector(MovieTableViewController.mainRefresh), for: .valueChanged)
-     //   self.refreshControl = self.refresh_control
+        refresh_control = UIRefreshControl()
+        refresh_control.addTarget(self, action: #selector(MovieTableViewController.mainRefresh), for: .valueChanged)
+        self.refreshControl = self.refresh_control
     
         mainRefresh()
         
         self.SearchBar.delegate = self
+        
+      
     }
     
     
     func mainRefresh(){
+        moviesData = Movie()
         
-        let requestURL = URL(string: "http://www.fandango.com/amclajolla12_aabam/theaterpage?date=1/15/2017")
+        let date = Date()
+        let dateFormatter = DateFormatter()
+        
+        
+        dateFormatter.dateFormat = "M/d/YYYY"
+        
+        let todayDate = dateFormatter.string(from: date)
+        
+        let requestURL = URL(string: OriginalSourceURL+todayDate)
         
         
         let task = session.downloadTask(with: requestURL!, completionHandler: {(location, response, error) -> Void in
             
             guard let httpResponse = response as? HTTPURLResponse else{
+                
+                let msgerr = (error?.localizedDescription)! as String
+                
+                print(msgerr)
+                
+                self.refreshControl?.endRefreshing()
                 return
             }
-            let statusCode = httpResponse.statusCode
             
-            if ( statusCode != 200){
+            if ( httpResponse.statusCode != 200){
+                print ("Not able to access the website")
+                self.refreshControl?.endRefreshing()
                 return
             }
             
             guard let data = try? Data(contentsOf: location!) else{
+                print ("Not able to retrieve data from the website")
+                self.refreshControl?.endRefreshing()
                 return
             }
             
             let fullText = String(data: data, encoding: String.Encoding.utf8)
             
             guard let ss = fullText else{
+                print ("data Failed to convert to String")
+                self.refreshControl?.endRefreshing()
                 return
             }
             
-            if !ss.contains("itemscope itemtype=\"http://schema.org/Movie"){
+            if !ss.contains(RequiredString){
+                print ("Does not have data to be loaded")
+                self.refreshControl?.endRefreshing()
                 return
             }
             
             self.refresh(source: ss)
             
-            
-            //self.refreshControl?.endRefreshing()
         })
         
         task.resume()
@@ -95,7 +117,7 @@ class MovieTableViewController: UITableViewController, UISearchBarDelegate{
     
     func refresh(source: String){
          let data = source
-         var partialData = data.components(separatedBy: "<span itemscope itemtype=\"http://schema.org/Movie\">")
+         var partialData = data.components(separatedBy: PartialData)
          
          partialData.remove(at: 0)
          
@@ -116,6 +138,7 @@ class MovieTableViewController: UITableViewController, UISearchBarDelegate{
          }
             DispatchQueue.main.sync {
                self.filteredData = self.moviesData
+                self.refreshControl?.endRefreshing()
                 self.tableView.reloadData()
             }
             
