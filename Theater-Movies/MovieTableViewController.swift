@@ -9,6 +9,7 @@
 import Foundation
 import UIKit
 
+
 struct Movie{
     var summaries = [String]()
     var images = [UIImage]()
@@ -22,7 +23,6 @@ class MovieTableViewController: UITableViewController, UISearchBarDelegate{
     var filteredData = Movie()
     
     var refresh_control:UIRefreshControl!
-    var myRefresh:UIRefreshControl!
     var session: URLSession!
 
     
@@ -47,11 +47,10 @@ class MovieTableViewController: UITableViewController, UISearchBarDelegate{
         refresh_control.addTarget(self, action: #selector(MovieTableViewController.mainRefresh), for: .valueChanged)
         self.refreshControl = self.refresh_control
     
-        mainRefresh()
-        
         self.SearchBar.delegate = self
         
-      
+        
+        mainRefresh()
     }
     
     
@@ -158,6 +157,7 @@ class MovieTableViewController: UITableViewController, UISearchBarDelegate{
         -> UITableViewCell {
             let cell = tableView.dequeueReusableCell(withIdentifier: "MovieCell", for: indexPath)
                 as! MovieCell
+
             cell.cell_image.image = filteredData.images[indexPath[1] as Int]
             cell.cell_description.text = filteredData.summaries[indexPath[1] as Int]
             cell.cell_title.text = filteredData.titles[indexPath[1] as Int]
@@ -166,15 +166,9 @@ class MovieTableViewController: UITableViewController, UISearchBarDelegate{
  
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         
-        var newFilter_image = [UIImage]()
-        var newFilter_title = [String]()
-        var newFilter_description = [String]()
-        
-        /*newFilter_title = moviesData.titles.filter({(title: String) -> Bool in
-            return (title.range(of: searchText, options: .caseInsensitive) != nil)
-            
-        })*/
-        if (searchText == ""){
+        var newFilterData = Movie()
+
+        if searchText == "" {
             self.filteredData = moviesData
             self.tableView.reloadData()
             return
@@ -182,14 +176,12 @@ class MovieTableViewController: UITableViewController, UISearchBarDelegate{
         
         for i in 0..<moviesData.images.count{
             if moviesData.titles[i].range(of: searchText, options: .caseInsensitive) != nil{
-                newFilter_title.append(moviesData.titles[i])
-                newFilter_image.append(moviesData.images[i])
-                newFilter_description.append(moviesData.summaries[i])
+                newFilterData.titles.append(moviesData.titles[i])
+                newFilterData.images.append(moviesData.images[i])
+                newFilterData.summaries.append(moviesData.summaries[i])
             }
         }
-        self.filteredData.titles = newFilter_title
-        self.filteredData.summaries = newFilter_description
-        self.filteredData.images = newFilter_image
+        self.filteredData = newFilterData
         
         self.tableView.reloadData()
         
