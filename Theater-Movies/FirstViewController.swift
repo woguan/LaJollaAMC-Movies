@@ -10,6 +10,11 @@ import UIKit
 
 class FirstViewController: UIViewController {
 
+    
+    @IBOutlet weak var mainText: UILabel!
+
+    @IBOutlet weak var bodyText: UILabel!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
@@ -53,9 +58,14 @@ class FirstViewController: UIViewController {
         }
         
       self.view.addSubview(v)*/
+       
+        let date = Date()
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MM/dd/yyyy"
+        let todayDate = dateFormatter.string(from: date)
+        self.mainText.text = todayDate
         
-        print ("first view")
-        
+        self.bodyText.text = "Showing movies of La Jolla AMC 12 Movie Theather"
     }
     
 

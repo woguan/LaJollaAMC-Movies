@@ -44,6 +44,10 @@
                         </constraints>
                     </view>
                     <tabBarItem key="tabBarItem" title="First" image="first" id="acW-dT-cKf"/>
+                    <connections>
+                        <outlet property="bodyText" destination="A5M-7J-77L" id="U3v-uU-uDg"/>
+                        <outlet property="mainText" destination="KQZ-1w-vlD" id="0Qp-Al-Fgt"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="W5J-7L-Pyd" sceneMemberID="firstResponder"/>
             </objects>
